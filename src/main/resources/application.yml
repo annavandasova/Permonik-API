@@ -2,4 +2,8 @@
 solr:
   host: http://localhost:8983/solr
 
-
+#SPRING DOC AND SWAGGER
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

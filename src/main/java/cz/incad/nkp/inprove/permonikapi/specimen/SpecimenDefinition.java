@@ -1,6 +1,7 @@
 package cz.incad.nkp.inprove.permonikapi.specimen;
 
 public interface SpecimenDefinition {
+    String SPECIMEN_CORE_NAME = "exemplar";
     String ID_FIELD = "id";
     String ID_ISSUE_FIELD = "id_issue";
     String ID_META_TITLE_FIELD = "id_titul";

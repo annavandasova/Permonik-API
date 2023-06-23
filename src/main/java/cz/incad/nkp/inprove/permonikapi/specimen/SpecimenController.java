@@ -1,11 +1,8 @@
 package cz.incad.nkp.inprove.permonikapi.specimen;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.query.result.StatsPage;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("api/v1/specimen")
@@ -19,9 +16,14 @@ public class SpecimenController {
     }
 
 
-    @GetMapping("/stats/overview")
-    public StatsPage<Specimen> getOverview(){
-        return specimenService.getOverview(PageRequest.of(0, 100));
-    }
+//    @PostMapping("/stats/overviews")
+//    public List<SpecimensOverviewDTO> getOverviews(@RequestBody List<String> titles){
+//        return specimenService.getOverviews(titles);
+//    }
+
+//    @GetMapping("/stats/overview/{idTitle}")
+//    public SpecimensOverviewDTO getOverview(@PathVariable String idTitle){
+//        return specimenService.getOverview(idTitle);
+//    }
 
 }

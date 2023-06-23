@@ -1,6 +1,7 @@
 package cz.incad.nkp.inprove.permonikapi.metaTitle;
 
 
+import cz.incad.nkp.inprove.permonikapi.metaTitle.dto.MetaTitleWithSpecimensOverviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,14 @@ public class MetaTitleController {
         this.metaTitleService = metaTitleService;
     }
 
-    @GetMapping("/all")
-    public List<MetaTitle> getAll(){
-        return metaTitleService.getAll();
+//    @GetMapping("/all")
+//    public List<MetaTitle> getAll(){
+//        return metaTitleService.getAll();
+//    }
+
+
+    @GetMapping("/overviews")
+    public List<MetaTitleWithSpecimensOverviewDTO> getOverviews(){
+        return metaTitleService.getOverviews();
     }
 }
