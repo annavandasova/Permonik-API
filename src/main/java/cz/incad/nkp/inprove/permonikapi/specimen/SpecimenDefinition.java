@@ -19,7 +19,7 @@ public interface SpecimenDefinition {
     String SUB_NAME_FIELD = "podnazev";
     String PUBLICATION_FIELD = "vydani";
     String MUTATION_FIELD = "mutace";
-    String RELEASE_MARK_SIGN = "znak_oznaceni_vydani";
+    String PUBLICATION_MARK_SIGN = "znak_oznaceni_vydani";
     String PUBLICATION_DATE_FIELD = "datum_vydani";
     String PUBLICATION_DAY_FIELD = "datum_vydani_den";
     String PERIODICITY_FIELD = "periodicita";

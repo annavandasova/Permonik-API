@@ -58,7 +58,7 @@ public class Specimen implements SpecimenDefinition{
     @Indexed(MUTATION_FIELD)
     private String mutation;
 
-    @Indexed(RELEASE_MARK_SIGN)
+    @Indexed(PUBLICATION_MARK_SIGN)
     private String releaseMark;
 
     @Indexed(PUBLICATION_DATE_FIELD)

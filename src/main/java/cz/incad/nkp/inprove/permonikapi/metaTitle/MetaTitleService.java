@@ -1,6 +1,6 @@
 package cz.incad.nkp.inprove.permonikapi.metaTitle;
 
-import cz.incad.nkp.inprove.permonikapi.metaTitle.dto.MetaTitleWithSpecimensOverviewDTO;
+import cz.incad.nkp.inprove.permonikapi.metaTitle.dto.MetaTitleWithSpecimensStatsDTO;
 import cz.incad.nkp.inprove.permonikapi.specimen.SpecimenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MetaTitleService {
@@ -24,21 +25,24 @@ public class MetaTitleService {
         this.specimenService = specimenService;
     }
 
+    public Optional<MetaTitle> getMetaTitleById(String metaTitleId) {
+        return metaTitleRepository.findById(metaTitleId);
+    }
 
-    public List<MetaTitle> getAll(){
+    public List<MetaTitle> getAllMetaTitles(){
         Iterable<MetaTitle> iterable = metaTitleRepository.findAll();
         return Streamable.of(iterable).toList();
     }
 
-    public List<MetaTitleWithSpecimensOverviewDTO> getOverviews(){
-        List<MetaTitle> metaTitles = getAll();
+    public List<MetaTitleWithSpecimensStatsDTO> getOverviewsWithStats(){
+        List<MetaTitle> metaTitles = getAllMetaTitles();
 
         return metaTitles
                 .stream()
-                .map(metaTitle -> new MetaTitleWithSpecimensOverviewDTO(
+                .map(metaTitle -> new MetaTitleWithSpecimensStatsDTO(
                 metaTitle.getId(),
                 metaTitle.getName(),
-                specimenService.getOverview(metaTitle.getId())
+                specimenService.getOverviewStats(metaTitle.getId())
                 )).toList();
     }
 

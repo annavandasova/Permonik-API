@@ -1,18 +1,14 @@
 package cz.incad.nkp.inprove.permonikapi.specimen;
 
-import cz.incad.nkp.inprove.permonikapi.specimen.dto.SpecimensOverviewDTO;
+import cz.incad.nkp.inprove.permonikapi.specimen.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrOperations;
-import org.springframework.data.solr.core.query.Criteria;
-import org.springframework.data.solr.core.query.GroupOptions;
-import org.springframework.data.solr.core.query.SimpleQuery;
-import org.springframework.data.solr.core.query.StatsOptions;
+import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static cz.incad.nkp.inprove.permonikapi.specimen.SpecimenDefinition.*;
 
@@ -31,13 +27,10 @@ public class SpecimenService {
     }
 
 
-    public List<SpecimensOverviewDTO> getOverviews(List<String> titles){
-        return titles.stream().map(this::getOverview).toList();
-    }
 
-    public SpecimensOverviewDTO getOverview(String idTitle) {
+    public SpecimensStatsDTO getOverviewStats(String idTitle) {
 
-        Criteria criteria = new Criteria(ID_META_TITLE_FIELD).contains(idTitle);
+        Criteria criteria = new Criteria(ID_META_TITLE_FIELD).is(idTitle);
 
         StatsOptions statsOptions = new StatsOptions();
         statsOptions.addField(MUTATION_FIELD).setSelectiveCalcDistinct(true).setCalcDistinct(true);
@@ -79,10 +72,82 @@ public class SpecimenService {
         Integer matchedSpecimens = countPage.getGroupResult(ID_ISSUE_FIELD).getMatches();
 
 
-        return new SpecimensOverviewDTO(publicationDayMin, publicationDayMax, mutationsCount, ownersCount, groupedSpecimens, matchedSpecimens);
+        return new SpecimensStatsDTO(publicationDayMin, publicationDayMax, mutationsCount, ownersCount, groupedSpecimens, matchedSpecimens);
 
     }
 
 
+    public SpecimensWithFacetsDTO getSpecimensWithFacetsByMetaTitle(String idTitle, Integer offset, Integer rows) {
 
+        Criteria criteria = new Criteria(ID_META_TITLE_FIELD)
+                .is(idTitle)
+                .and(NUM_EXISTS_FIELD).is(true);
+
+        FacetOptions facetOptions = new FacetOptions();
+        facetOptions.addFacetOnField(NAME_FIELD);
+        facetOptions.addFacetOnField(MUTATION_FIELD);
+        facetOptions.addFacetOnField(PUBLICATION_FIELD);
+        facetOptions.addFacetOnField(PUBLICATION_MARK_SIGN);
+        facetOptions.addFacetOnField(OWNER_FIELD);
+        facetOptions.addFacetOnField(STATES_FIELD);
+
+        SimpleFacetQuery facetQuery = new SimpleFacetQuery(criteria);
+        facetQuery.setRows(rows);
+        facetQuery.setOffset(Long.valueOf(offset));
+        facetQuery.setFacetOptions(facetOptions);
+        facetQuery.addSort(Sort.by(Sort.Direction.ASC, PUBLICATION_DAY_FIELD));
+        facetQuery.addSort(Sort.by(Sort.Direction.DESC, PUBLICATION_FIELD));
+
+        //Execute query with params
+        FacetPage<Specimen> facetPage = solrTemplate.queryForFacetPage(SPECIMEN_CORE_NAME, facetQuery, Specimen.class);
+
+
+        StatsOptions statsOptions = new StatsOptions();
+        statsOptions.addField(PUBLICATION_DAY_FIELD);
+
+        SimpleQuery statsQuery = new SimpleQuery(criteria);
+        statsQuery.setRows(0);
+        statsQuery.setStatsOptions(statsOptions);
+
+        StatsPage<Specimen> statsPage = solrTemplate.queryForStatsPage(SPECIMEN_CORE_NAME, statsQuery, Specimen.class);
+        Object publicationDayMin = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMin();
+        Object publicationDayMax = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMax();
+
+
+
+
+        GroupOptions groupOptions = new GroupOptions();
+        groupOptions.addGroupByField(ID_ISSUE_FIELD);
+        groupOptions.setLimit(20);
+        groupOptions.setTotalCount(true);
+
+        SimpleQuery groupQuery = new SimpleQuery(criteria);
+        groupQuery.setRows(rows);
+        groupQuery.setOffset(Long.valueOf(offset));
+        groupQuery.setGroupOptions(groupOptions);
+        groupQuery.addSort(Sort.by(Sort.Direction.ASC, PUBLICATION_DAY_FIELD));
+        groupQuery.addSort(Sort.by(Sort.Direction.DESC, PUBLICATION_FIELD));
+
+        GroupPage<Specimen> countPage = solrTemplate.queryForGroupPage(SPECIMEN_CORE_NAME, groupQuery, Specimen.class);
+
+        Integer groupedSpecimens = countPage.getGroupResult(ID_ISSUE_FIELD).getGroupsCount();
+
+
+        return new SpecimensWithFacetsDTO(
+                facetPage.getContent(),
+                new FacetsDTO(
+                        facetPage.getFacetResultPage(NAME_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(MUTATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(PUBLICATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(PUBLICATION_MARK_SIGN).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(OWNER_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(STATES_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList()
+                ),
+                publicationDayMax,
+                publicationDayMin,
+                groupedSpecimens
+
+        );
+
+    }
 }

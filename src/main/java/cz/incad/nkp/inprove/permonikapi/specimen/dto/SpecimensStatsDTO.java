@@ -1,6 +1,6 @@
 package cz.incad.nkp.inprove.permonikapi.specimen.dto;
 
-public record SpecimensOverviewDTO(
+public record SpecimensStatsDTO(
         Object publicationDayMin,
         Object publicationDayMax,
         Long mutationsCount,

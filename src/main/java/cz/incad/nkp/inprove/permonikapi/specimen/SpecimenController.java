@@ -1,5 +1,6 @@
 package cz.incad.nkp.inprove.permonikapi.specimen;
 
+import cz.incad.nkp.inprove.permonikapi.specimen.dto.SpecimensWithFacetsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,15 +16,10 @@ public class SpecimenController {
         this.specimenService = specimenService;
     }
 
+    @PostMapping("/{idTitle}")
+    public SpecimensWithFacetsDTO getSpecimensWithFacetsByMetaTitle(@PathVariable String idTitle, @RequestParam Integer offset, @RequestParam Integer rows){
+        return specimenService.getSpecimensWithFacetsByMetaTitle(idTitle, offset, rows);
+    }
 
-//    @PostMapping("/stats/overviews")
-//    public List<SpecimensOverviewDTO> getOverviews(@RequestBody List<String> titles){
-//        return specimenService.getOverviews(titles);
-//    }
-
-//    @GetMapping("/stats/overview/{idTitle}")
-//    public SpecimensOverviewDTO getOverview(@PathVariable String idTitle){
-//        return specimenService.getOverview(idTitle);
-//    }
 
 }

@@ -1,13 +1,12 @@
 package cz.incad.nkp.inprove.permonikapi.metaTitle;
 
 
-import cz.incad.nkp.inprove.permonikapi.metaTitle.dto.MetaTitleWithSpecimensOverviewDTO;
+import cz.incad.nkp.inprove.permonikapi.metaTitle.dto.MetaTitleWithSpecimensStatsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/metatitle")
@@ -19,14 +18,17 @@ public class MetaTitleController {
         this.metaTitleService = metaTitleService;
     }
 
-//    @GetMapping("/all")
-//    public List<MetaTitle> getAll(){
-//        return metaTitleService.getAll();
-//    }
+
+    @GetMapping("/{metaTitleId}")
+    /* Endpoint used for specimens result table */
+    public Optional<MetaTitle> getMetaTitleById(@PathVariable String metaTitleId){
+        return metaTitleService.getMetaTitleById(metaTitleId);
+    }
 
 
-    @GetMapping("/overviews")
-    public List<MetaTitleWithSpecimensOverviewDTO> getOverviews(){
-        return metaTitleService.getOverviews();
+    @GetMapping("/all/stats")
+    /* Endpoint used for home page */
+    public List<MetaTitleWithSpecimensStatsDTO> getOverviewsWithStats(){
+        return metaTitleService.getOverviewsWithStats();
     }
 }
