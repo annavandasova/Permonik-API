@@ -58,8 +58,8 @@ public class Specimen implements SpecimenDefinition{
     @Indexed(MUTATION_FIELD)
     private String mutation;
 
-    @Indexed(PUBLICATION_MARK_SIGN)
-    private String releaseMark;
+    @Indexed(PUBLICATION_MARK_FIELD)
+    private String publicationMark;
 
     @Indexed(PUBLICATION_DATE_FIELD)
     private String publicationDate;
@@ -76,13 +76,13 @@ public class Specimen implements SpecimenDefinition{
     @Indexed(META_TITLE_NAME_FIELD)
     private String metaTitleName;
 
-    @Indexed(PAGES_COUNT)
+    @Indexed(PAGES_COUNT_FIELD)
     private Integer pagesCount;
 
     @Indexed(IS_ATTACHMENT_FIELD)
     private Boolean isAttachment;
 
-    public Specimen(String id, String idIssue, String idMetaTitle, String barCode, Boolean numExists, Boolean numMissing, String signature, String owner, List<String> states, String stateDescription, String pages, String note, String name, String subName, String publication, String mutation, String releaseMark, String publicationDate, String publicationDay, String periodicity, String number, String metaTitleName, Integer pagesCount, Boolean isAttachment) {
+    public Specimen(String id, String idIssue, String idMetaTitle, String barCode, Boolean numExists, Boolean numMissing, String signature, String owner, List<String> states, String stateDescription, String pages, String note, String name, String subName, String publication, String mutation, String publicationMark, String publicationDate, String publicationDay, String periodicity, String number, String metaTitleName, Integer pagesCount, Boolean isAttachment) {
         this.id = id;
         this.idIssue = idIssue;
         this.idMetaTitle = idMetaTitle;
@@ -99,7 +99,7 @@ public class Specimen implements SpecimenDefinition{
         this.subName = subName;
         this.publication = publication;
         this.mutation = mutation;
-        this.releaseMark = releaseMark;
+        this.publicationMark = publicationMark;
         this.publicationDate = publicationDate;
         this.publicationDay = publicationDay;
         this.periodicity = periodicity;
@@ -241,12 +241,12 @@ public class Specimen implements SpecimenDefinition{
         this.mutation = mutation;
     }
 
-    public String getReleaseMark() {
-        return releaseMark;
+    public String getPublicationMark() {
+        return publicationMark;
     }
 
-    public void setReleaseMark(String releaseMark) {
-        this.releaseMark = releaseMark;
+    public void setPublicationMark(String publicationMark) {
+        this.publicationMark = publicationMark;
     }
 
     public String getPublicationDate() {
@@ -311,12 +311,12 @@ public class Specimen implements SpecimenDefinition{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Specimen specimen = (Specimen) o;
-        return Objects.equals(id, specimen.id) && Objects.equals(idIssue, specimen.idIssue) && Objects.equals(idMetaTitle, specimen.idMetaTitle) && Objects.equals(barCode, specimen.barCode) && Objects.equals(numExists, specimen.numExists) && Objects.equals(numMissing, specimen.numMissing) && Objects.equals(signature, specimen.signature) && Objects.equals(owner, specimen.owner) && Objects.equals(states, specimen.states) && Objects.equals(stateDescription, specimen.stateDescription) && Objects.equals(pages, specimen.pages) && Objects.equals(note, specimen.note) && Objects.equals(name, specimen.name) && Objects.equals(subName, specimen.subName) && Objects.equals(publication, specimen.publication) && Objects.equals(mutation, specimen.mutation) && Objects.equals(releaseMark, specimen.releaseMark) && Objects.equals(publicationDate, specimen.publicationDate) && Objects.equals(publicationDay, specimen.publicationDay) && Objects.equals(periodicity, specimen.periodicity) && Objects.equals(number, specimen.number) && Objects.equals(metaTitleName, specimen.metaTitleName) && Objects.equals(pagesCount, specimen.pagesCount) && Objects.equals(isAttachment, specimen.isAttachment);
+        return Objects.equals(id, specimen.id) && Objects.equals(idIssue, specimen.idIssue) && Objects.equals(idMetaTitle, specimen.idMetaTitle) && Objects.equals(barCode, specimen.barCode) && Objects.equals(numExists, specimen.numExists) && Objects.equals(numMissing, specimen.numMissing) && Objects.equals(signature, specimen.signature) && Objects.equals(owner, specimen.owner) && Objects.equals(states, specimen.states) && Objects.equals(stateDescription, specimen.stateDescription) && Objects.equals(pages, specimen.pages) && Objects.equals(note, specimen.note) && Objects.equals(name, specimen.name) && Objects.equals(subName, specimen.subName) && Objects.equals(publication, specimen.publication) && Objects.equals(mutation, specimen.mutation) && Objects.equals(publicationMark, specimen.publicationMark) && Objects.equals(publicationDate, specimen.publicationDate) && Objects.equals(publicationDay, specimen.publicationDay) && Objects.equals(periodicity, specimen.periodicity) && Objects.equals(number, specimen.number) && Objects.equals(metaTitleName, specimen.metaTitleName) && Objects.equals(pagesCount, specimen.pagesCount) && Objects.equals(isAttachment, specimen.isAttachment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, idIssue, idMetaTitle, barCode, numExists, numMissing, signature, owner, states, stateDescription, pages, note, name, subName, publication, mutation, releaseMark, publicationDate, publicationDay, periodicity, number, metaTitleName, pagesCount, isAttachment);
+        return Objects.hash(id, idIssue, idMetaTitle, barCode, numExists, numMissing, signature, owner, states, stateDescription, pages, note, name, subName, publication, mutation, publicationMark, publicationDate, publicationDay, periodicity, number, metaTitleName, pagesCount, isAttachment);
     }
 
 
@@ -339,7 +339,7 @@ public class Specimen implements SpecimenDefinition{
                 ", subName='" + subName + '\'' +
                 ", publication='" + publication + '\'' +
                 ", mutation='" + mutation + '\'' +
-                ", releaseMark='" + releaseMark + '\'' +
+                ", releaseMark='" + publicationMark + '\'' +
                 ", publicationDate=" + publicationDate +
                 ", publicationDay='" + publicationDay + '\'' +
                 ", periodicity='" + periodicity + '\'' +

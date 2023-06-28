@@ -1,5 +1,7 @@
 package cz.incad.nkp.inprove.permonikapi.specimen;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.incad.nkp.inprove.permonikapi.specimen.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,7 @@ public class SpecimenService {
 
     public SpecimensStatsDTO getOverviewStats(String idTitle) {
 
-        Criteria criteria = new Criteria(ID_META_TITLE_FIELD).is(idTitle);
+        Criteria criteria = new Criteria(ID_META_TITLE_FIELD).is(idTitle).and(NUM_EXISTS_FIELD).is(true);
 
         StatsOptions statsOptions = new StatsOptions();
         statsOptions.addField(MUTATION_FIELD).setSelectiveCalcDistinct(true).setCalcDistinct(true);
@@ -77,17 +79,63 @@ public class SpecimenService {
     }
 
 
-    public SpecimensWithFacetsDTO getSpecimensWithFacetsByMetaTitle(String idTitle, Integer offset, Integer rows) {
+    public SpecimensWithFacetsDTO getSpecimensWithFacetsByMetaTitle(String idTitle, Integer offset, Integer rows, String facets) throws JsonProcessingException {
 
-        Criteria criteria = new Criteria(ID_META_TITLE_FIELD)
-                .is(idTitle)
+        ObjectMapper objectMapper = new ObjectMapper();
+        SpecimenFacets specimenFacets = objectMapper.readValue(facets, SpecimenFacets.class);
+
+        Criteria criteria = new Criteria(ID_META_TITLE_FIELD).is(idTitle)
                 .and(NUM_EXISTS_FIELD).is(true);
+
+        for (String name : specimenFacets.getNames()) {
+            if (name.isEmpty()) {
+                criteria.and(new SimpleStringCriteria(NAME_FIELD + ":\"\""));
+            } else {
+                criteria.and(PUBLICATION_MARK_FIELD).is(name);
+            }
+        }
+
+        if(!specimenFacets.getMutations().isEmpty()){
+            criteria.and(MUTATION_FIELD).is(specimenFacets.getMutations());
+        }
+
+        if(!specimenFacets.getPublications().isEmpty()){
+            criteria.and(PUBLICATION_FIELD).is(specimenFacets.getPublications());
+        }
+
+        for (String publicationMark : specimenFacets.getPublicationMarks()) {
+            if (publicationMark.isEmpty()) {
+                criteria.and(new SimpleStringCriteria(PUBLICATION_MARK_FIELD + ":\"\""));
+            } else {
+                criteria.and(PUBLICATION_MARK_FIELD).is(publicationMark);
+            }
+        }
+
+        if(!specimenFacets.getOwners().isEmpty()){
+            criteria.and(OWNER_FIELD).is(specimenFacets.getOwners());
+        }
+
+        if(!specimenFacets.getStates().isEmpty()){
+            criteria.and(STATES_FIELD).is(specimenFacets.getStates());
+        }
+
+        if(!specimenFacets.getVolume().isEmpty()){
+            criteria.and(BAR_CODE_FIELD).contains(specimenFacets.getVolume());
+
+        }
+
+        // Add filtering based on year interval
+        if(specimenFacets.getDateStart() > 0 && specimenFacets.getDateEnd() > 0){
+            criteria
+                .and(PUBLICATION_DAY_FIELD).greaterThanEqual(specimenFacets.getDateStart() + "0101")
+                .and(PUBLICATION_DAY_FIELD).lessThanEqual(specimenFacets.getDateEnd() + "1231");
+        }
 
         FacetOptions facetOptions = new FacetOptions();
         facetOptions.addFacetOnField(NAME_FIELD);
         facetOptions.addFacetOnField(MUTATION_FIELD);
         facetOptions.addFacetOnField(PUBLICATION_FIELD);
-        facetOptions.addFacetOnField(PUBLICATION_MARK_SIGN);
+        facetOptions.addFacetOnField(PUBLICATION_MARK_FIELD);
         facetOptions.addFacetOnField(OWNER_FIELD);
         facetOptions.addFacetOnField(STATES_FIELD);
 
@@ -105,7 +153,12 @@ public class SpecimenService {
         StatsOptions statsOptions = new StatsOptions();
         statsOptions.addField(PUBLICATION_DAY_FIELD);
 
-        SimpleQuery statsQuery = new SimpleQuery(criteria);
+        SimpleQuery statsQuery = new SimpleQuery(
+                new Criteria(ID_META_TITLE_FIELD)
+                        .is(idTitle)
+                        .and(NUM_EXISTS_FIELD)
+                        .is(true)
+        );
         statsQuery.setRows(0);
         statsQuery.setStatsOptions(statsOptions);
 
@@ -130,7 +183,7 @@ public class SpecimenService {
 
         GroupPage<Specimen> countPage = solrTemplate.queryForGroupPage(SPECIMEN_CORE_NAME, groupQuery, Specimen.class);
 
-        Integer groupedSpecimens = countPage.getGroupResult(ID_ISSUE_FIELD).getGroupsCount();
+        Integer groupedSpecimens = countPage.getGroupResult(ID_ISSUE_FIELD).getMatches();
 
 
         return new SpecimensWithFacetsDTO(
@@ -139,7 +192,7 @@ public class SpecimenService {
                         facetPage.getFacetResultPage(NAME_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(MUTATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(PUBLICATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
-                        facetPage.getFacetResultPage(PUBLICATION_MARK_SIGN).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(PUBLICATION_MARK_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(OWNER_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(STATES_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList()
                 ),

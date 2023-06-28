@@ -19,12 +19,12 @@ public interface SpecimenDefinition {
     String SUB_NAME_FIELD = "podnazev";
     String PUBLICATION_FIELD = "vydani";
     String MUTATION_FIELD = "mutace";
-    String PUBLICATION_MARK_SIGN = "znak_oznaceni_vydani";
+    String PUBLICATION_MARK_FIELD = "znak_oznaceni_vydani";
     String PUBLICATION_DATE_FIELD = "datum_vydani";
     String PUBLICATION_DAY_FIELD = "datum_vydani_den";
     String PERIODICITY_FIELD = "periodicita";
     String NUMBER_FIELD = "cislo";
     String META_TITLE_NAME_FIELD = "meta_nazev";
-    String PAGES_COUNT = "pocet_stran";
+    String PAGES_COUNT_FIELD = "pocet_stran";
     String IS_ATTACHMENT_FIELD = "isPriloha";
 }
