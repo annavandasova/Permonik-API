@@ -91,7 +91,7 @@ public class SpecimenService {
             if (name.isEmpty()) {
                 criteria.and(new SimpleStringCriteria(NAME_FIELD + ":\"\""));
             } else {
-                criteria.and(PUBLICATION_MARK_FIELD).is(name);
+                criteria.and(NAME_FIELD).is(name);
             }
         }
 

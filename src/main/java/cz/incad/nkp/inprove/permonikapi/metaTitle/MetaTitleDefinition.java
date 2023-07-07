@@ -1,6 +1,7 @@
 package cz.incad.nkp.inprove.permonikapi.metaTitle;
 
 public interface MetaTitleDefinition {
+    String META_TITLE_CORE_NAME = "titul";
     String ID_FIELD = "id";
     String NAME_FIELD = "meta_nazev";
     String PERIODICITY_FIELD = "periodicita";

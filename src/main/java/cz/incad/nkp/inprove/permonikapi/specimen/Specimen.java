@@ -7,10 +7,12 @@ import org.springframework.data.solr.core.mapping.SolrDocument;
 import java.util.List;
 import java.util.Objects;
 
-@SolrDocument(collection = "exemplar")
+import static cz.incad.nkp.inprove.permonikapi.specimen.SpecimenDefinition.SPECIMEN_CORE_NAME;
+
+@SolrDocument(collection = SPECIMEN_CORE_NAME)
 public class Specimen implements SpecimenDefinition{
 
-    @Id @Indexed(ID_FIELD)
+    @Id @Indexed(value = ID_FIELD, required = true)
     private String id;
 
     @Indexed(ID_ISSUE_FIELD)

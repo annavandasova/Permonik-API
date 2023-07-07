@@ -7,10 +7,12 @@ import org.springframework.data.solr.core.mapping.SolrDocument;
 
 import java.util.Objects;
 
-@SolrDocument(collection = "titul")
+import static cz.incad.nkp.inprove.permonikapi.metaTitle.MetaTitleDefinition.META_TITLE_CORE_NAME;
+
+@SolrDocument(collection = META_TITLE_CORE_NAME)
 public class MetaTitle implements MetaTitleDefinition {
 
-    @Id @Indexed(ID_FIELD)
+    @Id @Indexed(value = ID_FIELD, required = true)
     private String id;
 
     @Field(NAME_FIELD)
