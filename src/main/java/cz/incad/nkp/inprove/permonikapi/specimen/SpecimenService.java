@@ -3,6 +3,7 @@ package cz.incad.nkp.inprove.permonikapi.specimen;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.incad.nkp.inprove.permonikapi.specimen.dto.*;
+import cz.incad.nkp.inprove.permonikapi.specimen.mapper.SpecimenDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,13 @@ public class SpecimenService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecimenService.class);
 
     private final SpecimenRepository specimenRepository;
+    private final SpecimenDTOMapper specimenDTOMapper;
     private final SolrOperations solrTemplate;
 
     @Autowired
-    public SpecimenService(SpecimenRepository specimenRepository, SolrOperations solrTemplate) {
+    public SpecimenService(SpecimenRepository specimenRepository, SpecimenDTOMapper specimenDTOMapper, SolrOperations solrTemplate) {
         this.specimenRepository = specimenRepository;
+        this.specimenDTOMapper = specimenDTOMapper;
         this.solrTemplate = solrTemplate;
     }
 
@@ -200,6 +203,35 @@ public class SpecimenService {
                 publicationDayMin,
                 groupedSpecimens
 
+        );
+
+    }
+
+
+    public SpecimensWithDatesDTO getSpecimensForVolumeWithDates (String barCode, String dateFrom, String dateTo){
+
+        Criteria criteria = new Criteria(BAR_CODE_FIELD).is(barCode)
+                .and(PUBLICATION_DATE_FIELD).greaterThanEqual(dateFrom)
+                .and(PUBLICATION_DATE_FIELD).lessThanEqual(dateTo);
+
+        StatsOptions statsOptions = new StatsOptions();
+        statsOptions.addField(PUBLICATION_DAY_FIELD);
+
+        SimpleQuery statsQuery = new SimpleQuery(criteria);
+        statsQuery.setRows(100000);
+        statsQuery.setStatsOptions(statsOptions);
+
+        StatsPage<Specimen> statsPage = solrTemplate.queryForStatsPage(SPECIMEN_CORE_NAME, statsQuery, Specimen.class);
+
+        Object publicationDayMin = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMin();
+        Object publicationDayMax = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMax();
+
+        return new SpecimensWithDatesDTO(
+                statsPage.getContent().stream().map(specimenDTOMapper).toList(),
+                new SpecimensPublicationRangeDTO(
+                        publicationDayMin,
+                        publicationDayMax
+                )
         );
 
     }
