@@ -12,6 +12,7 @@ public record SpecimenDTO (
     String signature,
     String owner,
     List<String> states,
+    String state,
     String stateDescription,
     SpecimenPagesDTO pages,
     String note,

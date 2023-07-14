@@ -5,6 +5,6 @@ public record SpecimensStatsDTO(
         Object publicationDayMax,
         Long mutationsCount,
         Long ownersCount,
-        Integer groupedSpecimens,
+//        Integer groupedSpecimens,
         Integer matchedSpecimens
 ) { }

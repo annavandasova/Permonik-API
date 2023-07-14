@@ -22,10 +22,17 @@ public class SpecimenController {
             @PathVariable String idTitle,
             @RequestParam Integer offset,
             @RequestParam Integer rows,
-            @RequestParam String facets
+            @RequestParam String facets,
+            @RequestParam String view
     ) throws JsonProcessingException {
-        return specimenService.getSpecimensWithFacetsByMetaTitle(idTitle, offset, rows, facets);
+        return specimenService.getSpecimensWithFacetsByMetaTitle(idTitle, offset, rows, facets, view);
     }
+
+    @GetMapping("/start_date/{idTitle}")
+    public Object getSpecimensStartDate(@PathVariable String idTitle){
+        return specimenService.getSpecimensStartDateByMetaTitle(idTitle);
+    }
+
 
 
 }

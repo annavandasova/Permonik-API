@@ -11,6 +11,7 @@ public interface SpecimenDefinition {
     String SIGNATURE_FIELD = "signatura";
     String OWNER_FIELD = "vlastnik";
     String STATES_FIELD = "stav";
+    String STATE_FIELD = "state";
     String STATE_DESCRIPTION_FIELD = "stav_popis";
     String PAGES_FIELD = "pages";
     String NOTE_FIELD = "poznamka";

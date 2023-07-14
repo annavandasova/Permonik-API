@@ -38,6 +38,7 @@ public class SpecimenDTOMapper implements Function<Specimen, SpecimenDTO> {
                     specimen.getSignature(),
                     specimen.getOwner(),
                     specimen.getStates(),
+                    specimen.getState(),
                     specimen.getStateDescription(),
                     getPages(specimen.getPages()),
                     specimen.getNote(),

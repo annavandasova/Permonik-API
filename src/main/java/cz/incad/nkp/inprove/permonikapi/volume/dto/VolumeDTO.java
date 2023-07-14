@@ -10,6 +10,7 @@ public record VolumeDTO (
         String metaTitleId,
         String mutation,
         List<VolumePeriodicityDTO> periodicity,
+        Integer pagesCount,
         String firstNumber,
         String lastNumber,
         String note,
