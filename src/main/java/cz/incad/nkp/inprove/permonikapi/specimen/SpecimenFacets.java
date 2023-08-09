@@ -10,6 +10,7 @@ public class SpecimenFacets {
     private String calendarDateStart;
     private String calendarDateEnd;
     private List<String> names;
+    private List<String> subNames;
     private List<String> mutations;
     private List<String> publications;
     private List<String> publicationMarks;
@@ -20,12 +21,13 @@ public class SpecimenFacets {
     public SpecimenFacets() {
     }
 
-    public SpecimenFacets(Integer dateStart, Integer dateEnd, String calendarDateStart, String calendarDateEnd, List<String> names, List<String> mutations, List<String> publications, List<String> publicationMarks, List<String> owners, List<String> states, String volume) {
+    public SpecimenFacets(Integer dateStart, Integer dateEnd, String calendarDateStart, String calendarDateEnd, List<String> names, List<String> subNames,List<String> mutations, List<String> publications, List<String> publicationMarks, List<String> owners, List<String> states, String volume) {
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
         this.calendarDateStart = calendarDateStart;
         this.calendarDateEnd = calendarDateEnd;
         this.names = names;
+        this.subNames = subNames;
         this.mutations = mutations;
         this.publications = publications;
         this.publicationMarks = publicationMarks;
@@ -72,6 +74,14 @@ public class SpecimenFacets {
 
     public void setNames(List<String> names) {
         this.names = names;
+    }
+
+    public List<String> getSubNames() {
+        return subNames;
+    }
+
+    public void setSubNames(List<String> subNames) {
+        this.subNames = subNames;
     }
 
     public List<String> getMutations() {
@@ -127,12 +137,12 @@ public class SpecimenFacets {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpecimenFacets that = (SpecimenFacets) o;
-        return Objects.equals(dateStart, that.dateStart) && Objects.equals(dateEnd, that.dateEnd) && Objects.equals(calendarDateStart, that.calendarDateStart) && Objects.equals(calendarDateEnd, that.calendarDateEnd) && Objects.equals(names, that.names) && Objects.equals(mutations, that.mutations) && Objects.equals(publications, that.publications) && Objects.equals(publicationMarks, that.publicationMarks) && Objects.equals(owners, that.owners) && Objects.equals(states, that.states) && Objects.equals(volume, that.volume);
+        return Objects.equals(dateStart, that.dateStart) && Objects.equals(dateEnd, that.dateEnd) && Objects.equals(calendarDateStart, that.calendarDateStart) && Objects.equals(calendarDateEnd, that.calendarDateEnd) && Objects.equals(names, that.names) && Objects.equals(subNames, that.subNames) && Objects.equals(mutations, that.mutations) && Objects.equals(publications, that.publications) && Objects.equals(publicationMarks, that.publicationMarks) && Objects.equals(owners, that.owners) && Objects.equals(states, that.states) && Objects.equals(volume, that.volume);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dateStart, dateEnd, calendarDateStart, calendarDateEnd, names, mutations, publications, publicationMarks, owners, states, volume);
+        return Objects.hash(dateStart, dateEnd, calendarDateStart, calendarDateEnd, names, subNames, mutations, publications, publicationMarks, owners, states, volume);
     }
 
     @Override
@@ -143,6 +153,7 @@ public class SpecimenFacets {
                 ", calendarDateStart='" + calendarDateStart + '\'' +
                 ", calendarDateEndt='" + calendarDateEnd + '\'' +
                 ", names=" + names +
+                ", subNames=" + subNames +
                 ", mutations=" + mutations +
                 ", publications=" + publications +
                 ", publicationMarks=" + publicationMarks +

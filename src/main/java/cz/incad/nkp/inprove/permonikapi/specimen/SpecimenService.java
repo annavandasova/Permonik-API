@@ -7,12 +7,15 @@ import cz.incad.nkp.inprove.permonikapi.specimen.mapper.SpecimenDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrOperations;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 import static cz.incad.nkp.inprove.permonikapi.specimen.SpecimenDefinition.*;
@@ -35,7 +38,7 @@ public class SpecimenService {
 
 
 
-    public SpecimensStatsDTO getOverviewStats(String idTitle) {
+    public SpecimensStatsDTO getBasicOverviewStatsForMetaTitle(String idTitle) {
 
         Criteria criteria = new Criteria(ID_META_TITLE_FIELD).is(idTitle).and(NUM_EXISTS_FIELD).is(true);
 
@@ -100,6 +103,14 @@ public class SpecimenService {
             }
         }
 
+        for (String subName : specimenFacets.getSubNames()) {
+            if (subName.isEmpty()) {
+                criteria.and(new SimpleStringCriteria(SUB_NAME_FIELD + ":\"\""));
+            } else {
+                criteria.and(SUB_NAME_FIELD).is(subName);
+            }
+        }
+
         if(!specimenFacets.getMutations().isEmpty()){
             criteria.and(MUTATION_FIELD).is(specimenFacets.getMutations());
         }
@@ -142,6 +153,7 @@ public class SpecimenService {
 
         FacetOptions facetOptions = new FacetOptions();
         facetOptions.addFacetOnField(NAME_FIELD);
+        facetOptions.addFacetOnField(SUB_NAME_FIELD);
         facetOptions.addFacetOnField(MUTATION_FIELD);
         facetOptions.addFacetOnField(PUBLICATION_FIELD);
         facetOptions.addFacetOnField(PUBLICATION_MARK_FIELD);
@@ -154,6 +166,7 @@ public class SpecimenService {
         facetQuery.setFacetOptions(facetOptions);
         facetQuery.addSort(Sort.by(Sort.Direction.ASC, PUBLICATION_DAY_FIELD));
         facetQuery.addSort(Sort.by(Sort.Direction.DESC, PUBLICATION_FIELD));
+//        facetQuery.addSort(Sort.by(Sort.Direction.ASC, MUTATION_FIELD));
 
         //Execute query with params
         FacetPage<Specimen> facetPage = solrTemplate.queryForFacetPage(SPECIMEN_CORE_NAME, facetQuery, Specimen.class);
@@ -199,6 +212,7 @@ public class SpecimenService {
                 facetPage.getContent().stream().map(specimenDTOMapper).toList(),
                 new FacetsDTO(
                         facetPage.getFacetResultPage(NAME_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+                        facetPage.getFacetResultPage(SUB_NAME_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(MUTATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(PUBLICATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
                         facetPage.getFacetResultPage(PUBLICATION_MARK_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
@@ -208,7 +222,6 @@ public class SpecimenService {
                 publicationDayMax,
                 publicationDayMin,
                 groupedSpecimens
-
         );
 
     }
@@ -259,5 +272,79 @@ public class SpecimenService {
         StatsPage<Specimen> statsPage = solrTemplate.queryForStatsPage(SPECIMEN_CORE_NAME, statsQuery, Specimen.class);
 
         return statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMin();
+    }
+
+
+    public SpecimensWithFacetsAndStatsDTO getSpecimensWithFacetsAndStatsByVolume (String volumeId){
+
+        Criteria criteria = new Criteria(BAR_CODE_FIELD).is(volumeId).and(NUM_EXISTS_FIELD).is(true);
+
+        StatsOptions statsOptions = new StatsOptions();
+        statsOptions.addField(NUMBER_FIELD);
+        statsOptions.addField(PUBLICATION_DAY_FIELD);
+        statsOptions.addField(PAGES_COUNT_FIELD);
+
+
+        SimpleQuery statsQuery = new SimpleQuery(criteria);
+        statsQuery.setRows(0);
+        statsQuery.setStatsOptions(statsOptions);
+        //Execute query with params
+        StatsPage<Specimen> statsPage = solrTemplate.queryForStatsPage(SPECIMEN_CORE_NAME, statsQuery, Specimen.class);
+
+        //Get specimens date range
+        Object publicationDayMin = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMin();
+        Object publicationDayMax = statsPage.getFieldStatsResult(PUBLICATION_DAY_FIELD).getMax();
+
+        //Get pages number range
+        Object numberMin = statsPage.getFieldStatsResult(NUMBER_FIELD).getMin();
+        Object numberMax = statsPage.getFieldStatsResult(NUMBER_FIELD).getMax();
+
+        //Get pages count sum
+        Object pagesCount = statsPage.getFieldStatsResult(PAGES_COUNT_FIELD).getSum();
+
+
+        // Get the current date
+        Date now = new Date();
+        // Subtract 200 years from the current date
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.YEAR, -200);
+        Date start = calendar.getTime();
+
+        FacetOptions facetOptions = new FacetOptions();
+        facetOptions.addFacetOnField(MUTATION_FIELD);
+        facetOptions.addFacetOnField(PUBLICATION_MARK_FIELD);
+        facetOptions.addFacetOnField(PUBLICATION_FIELD);
+        facetOptions.addFacetOnField(STATES_FIELD);
+        facetOptions.addFacetByRange(new FacetOptions.FieldWithDateRangeParameters(PUBLICATION_DATE_FIELD, start, now, "+1YEAR"));
+
+        SimpleFacetQuery facetQuery = new SimpleFacetQuery(criteria);
+        facetQuery.setFacetOptions(facetOptions);
+        facetQuery.setRows(0);
+
+        FacetPage<Specimen> facetPage = solrTemplate.queryForFacetPage(SPECIMEN_CORE_NAME, facetQuery, Specimen.class);
+
+
+        Criteria criteria2 = new Criteria(BAR_CODE_FIELD).is(volumeId).and(new Criteria(NUM_EXISTS_FIELD).is(true).or(NUM_MISSING_FIELD).is(true));
+        SimpleQuery simpleQuery = new SimpleQuery(criteria2);
+        simpleQuery.setRows(100000);
+
+        Page<Specimen> specimenPage = solrTemplate.queryForPage(SPECIMEN_CORE_NAME, simpleQuery, Specimen.class);
+
+
+        return new SpecimensWithFacetsAndStatsDTO(
+            publicationDayMin,
+            publicationDayMax,
+            numberMin,
+            numberMax,
+            pagesCount,
+            facetPage.getFacetResultPage(MUTATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+            facetPage.getFacetResultPage(PUBLICATION_MARK_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+            facetPage.getFacetResultPage(PUBLICATION_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+            facetPage.getFacetResultPage(STATES_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+            facetPage.getRangeFacetResultPage(PUBLICATION_DATE_FIELD).stream().map(facetFieldEntry -> new FacetFieldDTO(facetFieldEntry.getValue(), facetFieldEntry.getValueCount())).toList(),
+            specimenPage.stream().map(specimenDTOMapper).toList()
+        );
+
     }
 }

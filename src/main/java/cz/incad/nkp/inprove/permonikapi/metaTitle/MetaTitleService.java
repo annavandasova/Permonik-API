@@ -63,7 +63,7 @@ public class MetaTitleService {
                 .map(metaTitle -> new MetaTitleWithSpecimensStatsDTO(
                 metaTitle.getId(),
                 metaTitle.getName(),
-                specimenService.getOverviewStats(metaTitle.getId())
+                specimenService.getBasicOverviewStatsForMetaTitle(metaTitle.getId())
                 )).toList();
     }
 

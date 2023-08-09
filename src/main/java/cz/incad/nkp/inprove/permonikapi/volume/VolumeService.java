@@ -4,8 +4,10 @@ import cz.incad.nkp.inprove.permonikapi.metaTitle.MetaTitle;
 import cz.incad.nkp.inprove.permonikapi.metaTitle.MetaTitleService;
 import cz.incad.nkp.inprove.permonikapi.specimen.SpecimenService;
 import cz.incad.nkp.inprove.permonikapi.specimen.dto.SpecimensWithDatesDTO;
+import cz.incad.nkp.inprove.permonikapi.specimen.dto.SpecimensWithFacetsAndStatsDTO;
 import cz.incad.nkp.inprove.permonikapi.volume.dto.VolumeDTO;
 import cz.incad.nkp.inprove.permonikapi.volume.dto.VolumeDetailDTO;
+import cz.incad.nkp.inprove.permonikapi.volume.dto.VolumeOverviewStatsDTO;
 import cz.incad.nkp.inprove.permonikapi.volume.mapper.VolumeDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,41 @@ public class VolumeService {
         SpecimensWithDatesDTO specimensWithDatesDTO = specimenService.getSpecimensForVolumeWithDates(volumeDTO.get().barCode(), volumeDTO.get().dateFrom(), volumeDTO.get().dateTo());
 
         return Optional.of(new VolumeDetailDTO(volumeDTO, metaTitle, specimensWithDatesDTO));
+
+    }
+
+    public Optional<VolumeOverviewStatsDTO> getVolumeOverviewStats(String volumeId) {
+        Optional<VolumeDTO> volumeDTO = getVolumeById(volumeId);
+
+        if(volumeDTO.isEmpty()){
+            return Optional.empty();
+        }
+
+        Optional<MetaTitle> metaTitle = metaTitleService.getMetaTitleById(volumeDTO.get().metaTitleId());
+
+        if(metaTitle.isEmpty()){
+            return Optional.empty();
+        }
+
+        SpecimensWithFacetsAndStatsDTO specimensWithFacetsAndStatsDTO = specimenService.getSpecimensWithFacetsAndStatsByVolume(volumeId);
+
+        return Optional.of(new VolumeOverviewStatsDTO(
+            metaTitle.get().getName(),
+            volumeDTO.get().owner(),
+            volumeDTO.get().signature(),
+            volumeDTO.get().barCode(),
+            specimensWithFacetsAndStatsDTO.publicationDayMin(),
+            specimensWithFacetsAndStatsDTO.publicationDayMax(),
+            specimensWithFacetsAndStatsDTO.numberMin(),
+            specimensWithFacetsAndStatsDTO.numberMax(),
+            specimensWithFacetsAndStatsDTO.pagesCount(),
+            specimensWithFacetsAndStatsDTO.mutations(),
+            specimensWithFacetsAndStatsDTO.publicationMark(),
+            specimensWithFacetsAndStatsDTO.publication(),
+            specimensWithFacetsAndStatsDTO.states(),
+            specimensWithFacetsAndStatsDTO.publicationDayRanges(),
+            specimensWithFacetsAndStatsDTO.specimens()
+        ));
 
     }
 }
