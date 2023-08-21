@@ -10,7 +10,7 @@ import java.util.Optional;
 
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("api/v1/metatitle")
+@RequestMapping("v1/metatitle")
 public class MetaTitleController {
 
     private final MetaTitleService metaTitleService;

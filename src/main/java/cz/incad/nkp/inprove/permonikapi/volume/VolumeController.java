@@ -10,7 +10,7 @@ import java.util.Optional;
 
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("api/v1/volume")
+@RequestMapping("v1/volume")
 public class VolumeController {
 
     private final VolumeService volumeService;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 //@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("api/v1/specimen")
+@RequestMapping("v1/specimen")
 public class SpecimenController {
 
     private final SpecimenService specimenService;

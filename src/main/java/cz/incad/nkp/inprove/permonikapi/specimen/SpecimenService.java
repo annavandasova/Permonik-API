@@ -311,6 +311,8 @@ public class SpecimenService {
         calendar.add(Calendar.YEAR, -200);
         Date start = calendar.getTime();
 
+//        System.out.printf(String.valueOf(calendar.getTime()));
+//
         FacetOptions facetOptions = new FacetOptions();
         facetOptions.addFacetOnField(MUTATION_FIELD);
         facetOptions.addFacetOnField(PUBLICATION_MARK_FIELD);
