@@ -231,7 +231,8 @@ public class SpecimenService {
 
         Criteria criteria = new Criteria(BAR_CODE_FIELD).is(barCode)
                 .and(PUBLICATION_DATE_FIELD).greaterThanEqual(dateFrom)
-                .and(PUBLICATION_DATE_FIELD).lessThanEqual(dateTo);
+                .and(PUBLICATION_DATE_FIELD).lessThanEqual(dateTo)
+                .and(new Criteria(NUM_EXISTS_FIELD).is(true).or(NUM_MISSING_FIELD).is(true));
 
         StatsOptions statsOptions = new StatsOptions();
         statsOptions.addField(PUBLICATION_DAY_FIELD);
