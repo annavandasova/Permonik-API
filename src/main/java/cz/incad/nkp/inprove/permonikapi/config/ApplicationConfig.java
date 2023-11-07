@@ -13,7 +13,8 @@ import org.springframework.data.solr.repository.config.EnableSolrRepositories;
 @EnableSolrRepositories(basePackages = {
         "cz.incad.nkp.inprove.permonikapi.metaTitle",
         "cz.incad.nkp.inprove.permonikapi.specimen",
-        "cz.incad.nkp.inprove.permonikapi.volume"
+        "cz.incad.nkp.inprove.permonikapi.volume",
+        "cz.incad.nkp.inprove.permonikapi.user"
 })
 public class ApplicationConfig {
 
